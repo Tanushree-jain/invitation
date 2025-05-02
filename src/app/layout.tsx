@@ -13,7 +13,7 @@ const inter = Inter({ subsets: ["latin"] });
 
 // Metadata configuration
 export const metadata: Metadata = {
-  title: "Digital Invitation Creator",
+  title: "InviteMe",
   description: "Create beautiful digital invitations for any occasion",
 };
 
