@@ -21,6 +21,7 @@ export default function InvitationPage() {
     image: null
   })
   const [showPreview, setShowPreview] = useState(false)
+  const [dragActive, setDragActive] = useState(false)
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target
@@ -28,8 +29,44 @@ export default function InvitationPage() {
   }
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setFormData(prev => ({ ...prev, image: URL.createObjectURL(e.target.files![0]) }))
+    const file = e.target.files?.[0]
+    if (file) {
+      if (file.type.startsWith('image/')) {
+        const reader = new FileReader()
+        reader.onload = (event) => {
+          setFormData(prev => ({ ...prev, image: event.target?.result as string }))
+        }
+        reader.readAsDataURL(file)
+      } else {
+        alert('Please upload an image file')
+      }
+    }
+  }
+
+  const handleDrag = (e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    if (e.type === 'dragenter' || e.type === 'dragover') {
+      setDragActive(true)
+    } else if (e.type === 'dragleave') {
+      setDragActive(false)
+    }
+  }
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setDragActive(false)
+
+    const file = e.dataTransfer.files?.[0]
+    if (file && file.type.startsWith('image/')) {
+      const reader = new FileReader()
+      reader.onload = (event) => {
+        setFormData(prev => ({ ...prev, image: event.target?.result as string }))
+      }
+      reader.readAsDataURL(file)
+    } else {
+      alert('Please upload an image file')
     }
   }
 
@@ -107,109 +144,121 @@ export default function InvitationPage() {
   }
 
   return (
-    <div className="min-h-screen py-12 transition-colors duration-300">
-      <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="card p-8 backdrop-blur-lg bg-white/10 dark:bg-black/10">
-          <h1 className="text-5xl font-bold mb-16 text-center">Create Your Invitation</h1>
-          
-          <form onSubmit={handleSubmit} className="max-w-lg mx-auto space-y-6">
-            <div className="grid grid-cols-[140px,1fr] items-center gap-3">
-              <label className="text-xl font-normal">
-                Event Type
-              </label>
-              <select 
-                name="eventType"
-                value={formData.eventType}
-                onChange={handleInputChange}
-                required
-                className="w-full h-11 px-3 rounded bg-white/90 dark:bg-black/20 border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700 dark:text-gray-200"
-              >
-                <option>Birthday</option>
-                <option>Wedding</option>
-                <option>Anniversary</option>
-                <option>Graduation</option>
-                <option>Baby Shower</option>
-                <option>House Warming</option>
-              </select>
-            </div>
-
-            <div className="grid grid-cols-[140px,1fr] items-center gap-3">
-              <label className="text-xl font-normal">
-                Name
-              </label>
-              <input
-                type="text"
-                name="name"
-                value={formData.name}
-                onChange={handleInputChange}
-                required
-                className="w-full h-11 px-3 rounded bg-white/90 dark:bg-black/20 border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700 dark:text-gray-200"
-                placeholder="Enter name"
-              />
-            </div>
-
-            <div className="grid grid-cols-[140px,1fr] items-center gap-3">
-              <label className="text-xl font-normal">
-                Date
-              </label>
-              <input
-                type="date"
-                name="date"
-                value={formData.date}
-                onChange={handleInputChange}
-                required
-                className="w-full h-11 px-3 rounded bg-white/90 dark:bg-black/20 border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700 dark:text-gray-200"
-              />
-            </div>
-
-            <div className="grid grid-cols-[140px,1fr] items-center gap-3">
-              <label className="text-xl font-normal">
-                Venue
-              </label>
-              <input
-                type="text"
-                name="venue"
-                value={formData.venue}
-                onChange={handleInputChange}
-                required
-                className="w-full h-11 px-3 rounded bg-white/90 dark:bg-black/20 border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700 dark:text-gray-200"
-                placeholder="Enter venue"
-              />
-            </div>
-
-            <div className="grid grid-cols-[140px,1fr] items-start gap-3 mt-2">
-              <label className="text-xl font-normal pt-2">
-                Upload Image
-              </label>
-              <div className="w-full">
-                <label className="flex flex-col w-full h-48 border-2 border-dashed rounded cursor-pointer hover:bg-white/5 transition-colors border-gray-300 dark:border-gray-600">
-                  <div className="flex flex-col items-center justify-center h-full">
-                    <svg className="w-24 h-24 mb-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                    </svg>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                      Click to upload or drag and drop
-                    </p>
+    <div className="container py-5">
+      <div className="row justify-content-center">
+        <div className="col-lg-8">
+          <div className={`card shadow ${theme === 'dark' ? 'bg-dark text-white' : 'bg-white'}`}>
+            <div className="card-body p-4">
+              <h1 className={`text-center display-4 mb-5 ${theme === 'dark' ? 'text-white' : 'text-dark'}`}>
+                Create Your Invitation
+              </h1>
+              
+              <form onSubmit={handleSubmit} className="mx-auto" style={{ maxWidth: '600px' }}>
+                {(['eventType', 'name', 'date', 'venue'] as const).map((field) => (
+                  <div key={field} className="mb-4 row align-items-center">
+                    <label className={`col-sm-3 col-form-label fs-5 ${theme === 'dark' ? 'text-white' : 'text-dark'}`}>
+                      {field === 'eventType' ? 'Event Type' : field.charAt(0).toUpperCase() + field.slice(1)}
+                    </label>
+                    <div className="col-sm-9">
+                      {field === 'eventType' ? (
+                        <select
+                          name={field}
+                          value={formData[field]}
+                          onChange={handleInputChange}
+                          required
+                          className={`form-select ${theme === 'dark' ? 'bg-dark text-white' : 'bg-white text-dark'}`}
+                        >
+                          <option>Birthday</option>
+                          <option>Wedding</option>
+                          <option>Anniversary</option>
+                          <option>Graduation</option>
+                          <option>Baby Shower</option>
+                          <option>House Warming</option>
+                        </select>
+                      ) : (
+                        <input
+                          type={field === 'date' ? 'date' : 'text'}
+                          name={field}
+                          value={formData[field]}
+                          onChange={handleInputChange}
+                          required
+                          className={`form-control ${theme === 'dark' ? 'bg-dark text-white' : 'bg-white text-dark'}`}
+                          placeholder={field === 'date' ? undefined : `Enter ${field}`}
+                        />
+                      )}
+                    </div>
                   </div>
-                  <input 
-                    type="file" 
-                    className="hidden" 
-                    accept="image/*"
-                    onChange={handleImageUpload}
-                  />
-                </label>
-              </div>
-            </div>
+                ))}
 
-            <div className="mt-16">
-              <button
-                type="submit"
-                className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded transition-colors"
-              >
-                Create Invitation
-              </button>
+                <div className="mb-4 row align-items-start">
+                  <label className={`col-sm-3 col-form-label fs-5 ${theme === 'dark' ? 'text-white' : 'text-dark'}`}>
+                    Upload Image
+                  </label>
+                  <div className="col-sm-9">
+                    <div 
+                      className={`card ${theme === 'dark' ? 'bg-dark' : 'bg-white'} border-2 ${dragActive ? 'border-primary' : ''}`}
+                      onDragEnter={handleDrag}
+                      onDragLeave={handleDrag}
+                      onDragOver={handleDrag}
+                      onDrop={handleDrop}
+                    >
+                      <label className="card-body text-center py-5" style={{ cursor: 'pointer' }}>
+                        <input
+                          type="file"
+                          className="d-none"
+                          accept="image/*"
+                          onChange={handleImageUpload}
+                        />
+                        {formData.image ? (
+                          <div className="position-relative">
+                            <img 
+                              src={formData.image} 
+                              alt="Preview" 
+                              className="img-fluid mb-2" 
+                              style={{ maxHeight: '200px' }}
+                            />
+                            <p className={`mb-0 mt-2 ${theme === 'dark' ? 'text-white-50' : 'text-muted'}`}>
+                              Click or drag to change image
+                            </p>
+                          </div>
+                        ) : (
+                          <>
+                            <svg 
+                              className={`mx-auto mb-3 ${theme === 'dark' ? 'text-white' : 'text-dark'}`}
+                              width="50" 
+                              height="50" 
+                              fill="none" 
+                              stroke="currentColor" 
+                              viewBox="0 0 24 24"
+                            >
+                              <path 
+                                strokeLinecap="round" 
+                                strokeLinejoin="round" 
+                                strokeWidth="2" 
+                                d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                              />
+                            </svg>
+                            <p className={`mb-0 ${theme === 'dark' ? 'text-white-50' : 'text-muted'}`}>
+                              Click to upload or drag and drop
+                            </p>
+                          </>
+                        )}
+                      </label>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="text-center mt-5">
+                  <button
+                    type="submit"
+                    className="btn btn-primary btn-lg px-5"
+                  >
+                    Create Invitation
+                  </button>
+                </div>
+              </form>
             </div>
-          </form>
+          </div>
         </div>
       </div>
     </div>
