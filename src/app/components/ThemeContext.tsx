@@ -11,21 +11,36 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined)
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [isDarkMode, setIsDarkMode] = useState(false)
+  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
+    setMounted(true)
     // Check if user has a theme preference in localStorage
     const savedTheme = localStorage.getItem('theme')
-    setIsDarkMode(savedTheme === 'dark')
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+
+    if (savedTheme) {
+      setIsDarkMode(savedTheme === 'dark')
+    } else {
+      setIsDarkMode(prefersDark)
+    }
   }, [])
 
   useEffect(() => {
+    if (!mounted) return
+
     // Update body class and localStorage when theme changes
-    document.body.classList.toggle('dark-theme', isDarkMode)
+    document.documentElement.classList.toggle('dark-theme', isDarkMode)
     localStorage.setItem('theme', isDarkMode ? 'dark' : 'light')
-  }, [isDarkMode])
+  }, [isDarkMode, mounted])
 
   const toggleTheme = () => {
     setIsDarkMode(prev => !prev)
+  }
+
+  // Avoid theme flash on load
+  if (!mounted) {
+    return null
   }
 
   return (
