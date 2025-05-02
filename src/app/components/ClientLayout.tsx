@@ -1,8 +1,10 @@
 'use client'
 
 import Link from "next/link";
+import Image from "next/image";
 import BootstrapClient from './BootstrapClient';
 import { ThemeProvider, useTheme } from './ThemeContext';
+
 
 function ThemeToggle() {
   const { isDarkMode, toggleTheme } = useTheme();
@@ -34,8 +36,9 @@ function Layout({ children }: { children: React.ReactNode }) {
       {/* Sticky Header */}
       <nav className="navbar navbar-expand-lg navbar-light bg-light fixed-top shadow-sm">
         <div className="container">
-          <Link href="/" className="navbar-brand text-primary fw-bold fs-4">
-            <span className="animate-bounce">InviteMe</span>
+          <Link href="/" className="navbar-brand text-primary fw-bold fs-4 d-flex align-items-center gap-2">
+            <Image src="/images/logo.png" alt="InviteMe Logo" width={40} height={40} />
+            <span>InviteMe</span>
           </Link>
           <div className="navbar-nav ms-auto d-flex flex-row align-items-center gap-3">
             <Link href="/invitation" className="nav-link hover-effect">
