@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useTheme } from '@/components/ThemeProvider'
+import { downloadCard } from '@/utils/downloadUtils'
 
 interface FormData {
   occasionType: string
@@ -94,38 +95,28 @@ export default function WishesPage() {
               </button>
             </div>
             
-            <div className="relative aspect-[4/3] rounded-xl overflow-hidden mb-8">
-              {formData.image ? (
+            <div id="wishes-card" className="relative aspect-[4/3] rounded-xl overflow-hidden mb-8 bg-gradient-to-br from-pink-500 to-orange-500 flex items-center justify-center">
+              {formData.image && (
                 <img 
                   src={formData.image} 
                   alt="Greeting card preview" 
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover opacity-80 absolute inset-0"
                 />
-              ) : (
-                <div className="absolute inset-0 flex items-center justify-center bg-gray-100 dark:bg-gray-700">
-                  <div className="text-center p-6">
-                    <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
-                      <svg className="w-8 h-8 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                      </svg>
-                    </div>
-                    <p className="text-gray-500 dark:text-gray-400">
-                      No image uploaded
-                    </p>
-                  </div>
-                </div>
               )}
-              <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/70 to-transparent">
-                <h3 className="text-2xl font-bold text-white">Dear {formData.recipientName || 'Friend'}</h3>
-                <p className="text-white/90 my-2" style={{ whiteSpace: 'pre-wrap' }}>{formData.message || 'Your message'}</p>
-                <p className="text-white/80 mt-2">From: {formData.senderName || 'Sender'}</p>
-                <p className="text-white/80">{formData.occasionType} Wishes</p>
+              <div className="relative z-10 flex flex-col items-center justify-center text-center p-8 bg-black/30 rounded-xl w-full h-full">
+                <h3 className="text-2xl font-bold text-white mb-4">Dear {formData.recipientName || 'Friend'}</h3>
+                <p className="text-lg text-white/90 mb-4" style={{ whiteSpace: 'pre-wrap' }}>{formData.message || 'Your message'}</p>
+                <div className="mt-auto">
+                  <p className="text-lg text-white/80">From: {formData.senderName || 'Sender'}</p>
+                  <p className="text-lg text-white/80">{formData.occasionType} Wishes</p>
+                </div>
               </div>
             </div>
 
             <div className="flex space-x-4">
               <button
                 type="button"
+                onClick={() => downloadCard('wishes-card', `wishes-${formData.recipientName || 'greeting'}`)}
                 className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
               >
                 Download

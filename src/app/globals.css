@@ -325,3 +325,22 @@ body::before {
     text-wrap: balance;
   }
 }
+
+.frame-classic {
+  border: 6px solid #e2e2e2;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+}
+.frame-gold {
+  border: 6px solid #FFD700;
+  box-shadow: 0 4px 24px rgba(255, 215, 0, 0.15);
+}
+.frame-floral {
+  border: 8px double #b48eae;
+  box-shadow: 0 4px 24px rgba(180, 142, 174, 0.12);
+  background-image: repeating-linear-gradient(135deg, #f8e1f4 0 10px, transparent 10px 20px);
+}
+.frame-modern {
+  border: 6px solid #4f8cff;
+  box-shadow: 0 4px 24px rgba(79, 140, 255, 0.12);
+  border-radius: 2rem;
+}
